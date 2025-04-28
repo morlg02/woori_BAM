@@ -6,7 +6,7 @@ import java.util.ArrayList;
  		System.out.println("== 프로그램 시작 ==");
  		Scanner sc = new Scanner(System.in); 
  
- 		int lastArticleId = 1;  // 게시글 번호, 마지막게시글번호 수정
+ 		int lastArticleId = 1;  
  		List<Article> articles = new ArrayList<>();
  
  		while (true) {
@@ -16,11 +16,11 @@ import java.util.ArrayList;
  			if (cmd.equals("exit")) {
  				break;
  			} 
+ 			
  			if (cmd.length() == 0) {
  				System.out.println("명령어를 입력해 주세요");
  				continue;
  			}
- 			// List 메서드중 size() 이용 (Data 유무를 객체의 객수(크기)로 변환)
  			if (cmd.equals("article write")) {
  
  				System.out.printf("제목 : ");
@@ -30,6 +30,7 @@ import java.util.ArrayList;
  
  				Article article = new Article(lastArticleId,title,body); 
  				articles.add(article); 
+ 
  				System.out.println(lastArticleId +"번글이 생성되었습니다");
  				lastArticleId++;
  
@@ -45,32 +46,42 @@ import java.util.ArrayList;
  				for (int i = articles.size() -1 ; i >= 0; i--) {
  					Article article = articles.get(i);
  					System.out.printf("%d      |     %s\n", article.id, article.title);
- 				} 				
- 			} else if (cmd.startsWith("article detail ")) { // 입력된 번호 ==> cmdBits[2]
- 				String[] cmdBits = cmd.split(" "); 				
- //				boolean articleChk = false;   
+ 				}
+ 
+ 			} else if (cmd.startsWith("article detail ")) { 
+ 				String[] cmdBits = cmd.split(" ");
+ 
  				Article foundArticle = null;
+ 
+ 				int id = 0;
  				
- 				int id = Integer.parseInt(cmdBits[2]); 
+ 				try { // Exception 발생 할 예상 코드 블럭
+ 					 id = Integer.parseInt(cmdBits[2]); 
  				
+ 				} catch (NumberFormatException e) { // (예외타입 변수명)
+ 					System.out.println("정수를 입력하시길 바랍니다");
+ 					continue;  // 이하 실행이 안되도록 ==> while 작동
+ 				} catch (Exception e)	 {
+ 					// 그밖에 모든 Exception 처리한다
+ 				}
+ 
  				for (Article article : articles) {
- 					if (article.id == id) {  // 문자로 된 숫자를 ==> 숫자
+ 					if (article.id == id) {  
  						foundArticle = article ;
  						break;
  					}
  				}
- 				
- //				if (articleChk == false) {
+ 
  				if (foundArticle == null) {
  					System.out.println(id + "번 게시물이 존재하지 않습니다");
- 					continue;     // 매우 매우 중요.  아래에서 NullPointException 발생이 안되도록 조치
+ 					continue;     
  				}
- 				
+ 
  				System.out.println("번호 : " + foundArticle.id);
  				System.out.println("날짜 : ~~~");
  				System.out.println("제목 : " + foundArticle.title);
  				System.out.println("내용 : " + foundArticle.body);
- 				
+ 
  			}else {
  				System.out.println("존재하지 않는 명령어 입니다");
  			}
