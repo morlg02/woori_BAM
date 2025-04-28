@@ -16,7 +16,7 @@ import java.util.ArrayList;
  			if (cmd.equals("exit")) {
  				break;
  			} 
- 			
+ 
  			if (cmd.length() == 0) {
  				System.out.println("명령어를 입력해 주세요");
  				continue;
@@ -54,10 +54,10 @@ import java.util.ArrayList;
  				Article foundArticle = null;
  
  				int id = 0;
- 				
+ 
  				try { // Exception 발생 할 예상 코드 블럭
  					 id = Integer.parseInt(cmdBits[2]); 
- 				
+ 
  				} catch (NumberFormatException e) { // (예외타입 변수명)
  					System.out.println("정수를 입력하시길 바랍니다");
  					continue;  // 이하 실행이 안되도록 ==> while 작동
@@ -82,6 +82,57 @@ import java.util.ArrayList;
  				System.out.println("제목 : " + foundArticle.title);
  				System.out.println("내용 : " + foundArticle.body);
  
+ 				
+ 			} else if (cmd.startsWith("article delete ")) { 
+ 				String[] cmdBits = cmd.split(" ");  // 재 사용? Y
+ 				
+ 				Article foundArticle = null;  // Y
+ 				
+ 				int id = 0; // Y
+ 			
+ 				// 재사용 Y
+ 				try { // Exception 발생 할 예상 코드 블럭
+ 					id = Integer.parseInt(cmdBits[2]); 
+ 					
+ 				} catch (NumberFormatException e) { // (예외타입 변수명)
+ 					System.out.println("정수를 입력하시길 바랍니다");
+ 					continue;  // 이하 실행이 안되도록 ==> while 작동
+ 				} catch (Exception e)	 {
+ 					// 그밖에 모든 Exception 처리한다
+ 				}
+ 				
+ 				int foundIndex = -1; // null 과 개념, -1 초기화
+ 				int indexId = 0;		
+ 
+ 				// 재사용 Y  , 향상된 FOR문 인텍스 사용 X, 일반 FOR문 사용 -> 수정
+ 				for (Article article : articles) {
+ 					if (article.id == id) {  
+ 						foundArticle = article ;
+ 						foundIndex = indexId; 
+ 						break;
+ 					}
+ 					indexId++;
+ 				}
+ 				
+ 				// 인덱스 방식
+ //				for (int i = 0; i < articles.size(); i++) {
+ //					Article article = articles.get(i);
+ //					if (article.id == id) {  
+ //						break;
+ //					}
+ //			
+ //				}
+ 				
+ 				if (foundArticle == null) {
+ 					System.out.println(id + "번 게시물이 존재하지 않습니다");
+ 					continue;     
+ 				}
+ 				
+ 			    articles.remove(foundArticle); // 2가지 방법이 있음 remove(객체)
+ //			    articles.remove(foundIndex);   // 상동 remove(인덱스)
+ 			    
+ 			    System.out.println(foundArticle.id + "번 게시물이 삭제 되었습니다");
+ 				
  			}else {
  				System.out.println("존재하지 않는 명령어 입니다");
  			}
