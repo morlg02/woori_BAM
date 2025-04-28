@@ -6,7 +6,7 @@ import java.util.ArrayList;
  		System.out.println("== 프로그램 시작 ==");
  		Scanner sc = new Scanner(System.in); 
  
- 		int lastArticleId = 1;  
+ 		int lastArticleId = 1;  //게시글 번호이니까...마지막게시글번호로 수정
  		List<Article> articles = new ArrayList<>();
  
  		while (true) {
@@ -16,11 +16,11 @@ import java.util.ArrayList;
  			if (cmd.equals("exit")) {
  				break;
  			} 
- 
  			if (cmd.length() == 0) {
  				System.out.println("명령어를 입력해 주세요");
  				continue;
  			}
+ 			// List 메서드중 size() 이용 (Data 유무를 객체의 객수(크기)로 변환)
  			if (cmd.equals("article write")) {
  
  				System.out.printf("제목 : ");
@@ -28,7 +28,7 @@ import java.util.ArrayList;
  				System.out.printf("내용 : ");
  				String body = sc.nextLine().trim(); 
  
- 				Article article = new Article(lastArticleId,title,body); 
+ 				Article article = new Article(lastArticleId , title, body); 
  				articles.add(article); 
  
  				System.out.println(lastArticleId +"번글이 생성되었습니다");
@@ -45,36 +45,36 @@ import java.util.ArrayList;
  				System.out.printf("번호    |     제목\n");
  				for (int i = articles.size() -1 ; i >= 0; i--) {
  					Article article = articles.get(i);
- 					System.out.printf("%d      |     %s\n", article.id, article.title);
+ 					System.out.printf("%d       |     %s\n", article.id, article.title);
  				}
  
- 			} else if (cmd.startsWith("article detail ")) { 
- 				String[] cmdBits = cmd.split(" ");
- 
- 				Article foundArticle = null;
+ 			} else if (cmd.startsWith("article detail ")) { // article detail 로 시작하니?
+ 				String[] cmdBits = cmd.split(" ");  // 번호 ==> cmdBits[2]
  
  				int id = 0;
  
- 				try { // Exception 발생 할 예상 코드 블럭
- 					 id = Integer.parseInt(cmdBits[2]); 
- 
- 				} catch (NumberFormatException e) { // (예외타입 변수명)
- 					System.out.println("정수를 입력하시길 바랍니다");
- 					continue;  // 이하 실행이 안되도록 ==> while 작동
- 				} catch (Exception e)	 {
- 					// 그밖에 모든 Exception 처리한다
+ 				try {
+ 					id = Integer.parseInt(cmdBits[2]);  
+ 				} catch (NumberFormatException e) {
+ 					System.out.println("명령어가 올바르지 않습니다");
+ 					continue;
+ 				} catch (Exception e) {
+ 					e.printStackTrace();
  				}
  
+ 
+ 				Article foundArticle = null; 
+ 
  				for (Article article : articles) {
- 					if (article.id == id) {  
- 						foundArticle = article ;
+ 					if (article.id == id) {
+ 						foundArticle = article;
  						break;
  					}
  				}
  
- 				if (foundArticle == null) {
+ 				if (foundArticle == null) { // null 검증
  					System.out.println(id + "번 게시물이 존재하지 않습니다");
- 					continue;     
+ 					continue;
  				}
  
  				System.out.println("번호 : " + foundArticle.id);
@@ -82,58 +82,67 @@ import java.util.ArrayList;
  				System.out.println("제목 : " + foundArticle.title);
  				System.out.println("내용 : " + foundArticle.body);
  
- 				
  			} else if (cmd.startsWith("article delete ")) { 
- 				String[] cmdBits = cmd.split(" ");  // 재 사용? Y
- 				
- 				Article foundArticle = null;  // Y
- 				
- 				int id = 0; // Y
- 			
- 				// 재사용 Y
- 				try { // Exception 발생 할 예상 코드 블럭
- 					id = Integer.parseInt(cmdBits[2]); 
- 					
- 				} catch (NumberFormatException e) { // (예외타입 변수명)
- 					System.out.println("정수를 입력하시길 바랍니다");
- 					continue;  // 이하 실행이 안되도록 ==> while 작동
- 				} catch (Exception e)	 {
- 					// 그밖에 모든 Exception 처리한다
- 				}
- 				
- 				int foundIndex = -1; // null 과 개념, -1 초기화
- 				int indexId = 0;		
+ 				String[] cmdBits = cmd.split(" ");  
  
- 				// 재사용 Y  , 향상된 FOR문 인텍스 사용 X, 일반 FOR문 사용 -> 수정
+ 				int id = 0;  
+ 
+ 				try {
+ 					id = Integer.parseInt(cmdBits[2]);  
+ 				} catch (NumberFormatException e) {
+ 					System.out.println("명령어가 올바르지 않습니다");
+ 					continue;
+ 				} catch (Exception e) {
+ 					e.printStackTrace();
+ 				}
+ 
+ 				Article foundArticle = null;  // 재활용과 null 검증을 위해
+ 
  				for (Article article : articles) {
- 					if (article.id == id) {  
- 						foundArticle = article ;
- 						foundIndex = indexId; 
+ 					if (article.id == id) {
+ 						foundArticle = article; // 객체지향프로그래밍 , 무조건 이용
  						break;
  					}
- 					indexId++;
  				}
- 				
- 				// 인덱스 방식
+ 
+ 				//향상된 for문 이용 + foundIndex 이용 
+ //			    int foundIndex = -1 ; // null과 같은 의미로 -1 로 초기화 (존재하지 않는 index 의미)
+ //
+ //			    int indexId = 0;
+ //			    
+ //			    for(Article article : articles) {
+ //			    	if (article.id == id) {
+ //			    		foundIndex = indexId;
+ //			    		foundArticle = article; // 누락된 명령어, null 검증 위해 필요
+ //			    		break;
+ //			    	}
+ //			    	indexId++;
+ //			    }
+ 
+ 			    // 일반 for문 이용 + foundIndx 이용 
+ //			    int foundIndex = -1 ; // null과 같은 의미로 -1 로 초기화 (존재하지 않는 index 의미)
+ //				
  //				for (int i = 0; i < articles.size(); i++) {
- //					Article article = articles.get(i);
- //					if (article.id == id) {  
+ //					Article article =articles.get(i);
+ //					if (article.id == id) {
+ //						foundArticle = article;  // 누락된 명령어, null 검증 위해 필요
+ //						foundIndex = i;
  //						break;
  //					}
- //			
  //				}
- 				
- 				if (foundArticle == null) {
+ 
+ 				// null 검증 
+ 				if (foundArticle == null) { 
  					System.out.println(id + "번 게시물이 존재하지 않습니다");
- 					continue;     
+ 					continue;
  				}
- 				
- 			    articles.remove(foundArticle); // 2가지 방법이 있음 remove(객체)
- //			    articles.remove(foundIndex);   // 상동 remove(인덱스)
- 			    
- 			    System.out.println(foundArticle.id + "번 게시물이 삭제 되었습니다");
- 				
- 			}else {
+ 
+ 				articles.remove(foundArticle);   // 2가지 방법이 있지요. 첫번째 : 객체 이용
+ //				articles.remove(foundIndex);     // 두번쨰 : 인덱스 이용, foundIndex 이용하는 방법(2가지도)도 주석처리
+ 
+ 				System.out.println(id + "번 게시물이 삭제 되었습니다");
+ 
+ 			} else {
  				System.out.println("존재하지 않는 명령어 입니다");
  			}
  		}
