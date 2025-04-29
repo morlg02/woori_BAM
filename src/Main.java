@@ -1,70 +1,72 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
 public class Main {
-	public static void main(String[] args) {
-		
+	
+	 static List<Article> articles = new ArrayList<>();
+	 static int lastArticleId = 1;
+
+	 public static void main(String[] args) {
+
 		System.out.println("== 프로그램 시작 ==");
-		Scanner sc = new Scanner(System.in); 
-       
-		int lastArticleId = 1;  
-		List<Article> articles = new ArrayList<>();
+		Scanner sc = new Scanner(System.in);
+
+		makeTestData(); // 중요 --> 해당 메소드가 만들어 지는 위치?  static 메소드일수 밖에 없는 이유? 
 		
 		while (true) {
 			System.out.printf("명령어) ");
-			String cmd = sc.nextLine().trim(); 
-			
+			String cmd = sc.nextLine().trim();
+
 			if (cmd.equals("exit")) {
 				break;
-			} 
+			}
+
 			if (cmd.length() == 0) {
-				System.out.println("명령어를 입력해 주세요");
+				System.out.println("명령어를 입력해주세요");
 				continue;
 			}
 
 			if (cmd.equals("article write")) {
-		
 				System.out.printf("제목 : ");
-				String title = sc.nextLine().trim(); 
+				String title = sc.nextLine().trim();
 				System.out.printf("내용 : ");
-				String body = sc.nextLine().trim(); 
-				
-				Article article = new Article(lastArticleId , title, body, Util.getDateStr(), 0); 
-				articles.add(article); 
-				
-				System.out.println(lastArticleId +"번글이 생성되었습니다");
-				lastArticleId++;
-				
-			} else if(cmd.equals("article list")){
+				String body = sc.nextLine().trim();
 
-				if (articles.size() == 0 ) {
+				Article article = new Article(lastArticleId, Util.getDateStr(), title, body, 0);
+				articles.add(article);
+
+				System.out.println(lastArticleId + "번 글이 생성되었습니다");
+				lastArticleId++;
+
+			} else if (cmd.equals("article list")) {
+				if (articles.size() == 0) {
 					System.out.println("존재하는 게시글이 없습니다");
 					continue;
-					
 				}
-				
-				System.out.printf("번호    |     제목   |    내용   |   날짜 와 시간    |   조회수\n");
-				for (int i = articles.size() -1 ; i >= 0; i--) {
+
+				// 타이틀 줄 수정 (내용을 제거)
+				System.out.println("번호	|	제목	|		날짜		|	조회수");
+
+				// 출력 수정(상동)
+				for (int i = articles.size() - 1; i >= 0; i--) {
 					Article article = articles.get(i);
-					System.out.printf("%d      |     %s   |   %s   |  %s     |     %d \n", article.id, article.title, article.body, article.regDate, article.viewCnt);
+					System.out.printf("%d	|	%s	|	%s	|	%d\n", article.id, article.title, article.regDate, article.viewCnt);
 				}
 				
-			} else if (cmd.startsWith("article detail ")) { 
-				String[] cmdBits = cmd.split(" ");  
-				
+			} else if (cmd.startsWith("article detail ")) {
+				String[] cmdBits = cmd.split(" ");
+
 				int id = 0;
 				
 				try {
-					id = Integer.parseInt(cmdBits[2]);  
+					id = Integer.parseInt(cmdBits[2]);
 				} catch (NumberFormatException e) {
 					System.out.println("명령어가 올바르지 않습니다");
 					continue;
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
-
 				
-				Article foundArticle = null; 
+				Article foundArticle = null;
 				
 				for (Article article : articles) {
 					if (article.id == id) {
@@ -73,109 +75,133 @@ public class Main {
 					}
 				}
 				
-				if (foundArticle == null) { 
+				if (foundArticle == null) {
 					System.out.println(id + "번 게시물이 존재하지 않습니다");
 					continue;
 				}
-
-				foundArticle.viewCnt++;  // 위에 null 검증 통과했으로 조회수 1 증가
+				
+				foundArticle.increaseViewCnt();
 				
 				System.out.println("번호 : " + foundArticle.id);
 				System.out.println("날짜 : " + foundArticle.regDate);
 				System.out.println("제목 : " + foundArticle.title);
 				System.out.println("내용 : " + foundArticle.body);
-				System.out.println("조회수 : " + foundArticle.viewCnt); // viewCnt 추가
+				System.out.println("조회수 : " + foundArticle.viewCnt);
+				
+			} else if (cmd.startsWith("article modify ")) {
+				String[] cmdBits = cmd.split(" ");
 
-			} else if (cmd.startsWith("article delete ")) { 
-				String[] cmdBits = cmd.split(" ");  
-				
-				int id = 0;  
+				int id = 0;
 				
 				try {
-					id = Integer.parseInt(cmdBits[2]);  
+					id = Integer.parseInt(cmdBits[2]);
 				} catch (NumberFormatException e) {
 					System.out.println("명령어가 올바르지 않습니다");
 					continue;
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
 				
-				Article foundArticle = null;  
+				Article foundArticle = null;
 				
 				for (Article article : articles) {
 					if (article.id == id) {
-						foundArticle = article; 
+						foundArticle = article;
 						break;
 					}
 				}
 				
-				if (foundArticle == null) { 
+				if (foundArticle == null) {
 					System.out.println(id + "번 게시물이 존재하지 않습니다");
 					continue;
 				}
 				
-				articles.remove(foundArticle);   
-				
-				System.out.println(id + "번 게시물이 삭제 되었습니다");
-				
-			} else if (cmd.startsWith("article modify ")) { 
-				String[] cmdBits = cmd.split(" ");  
-				
-				int id = 0;  
-				
-				try {
-					id = Integer.parseInt(cmdBits[2]);  
-				} catch (NumberFormatException e) {
-					System.out.println("명령어가 올바르지 않습니다");
-					continue;
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				Article foundArticle = null;  
-				
-				for (Article article : articles) {
-					if (article.id == id) {
-						foundArticle = article;   
-						break;
-					}
-				}
-				
-				if (foundArticle == null) { 
-					System.out.println(id + "번 게시물이 존재하지 않습니다");
-					continue;
-				}
-				
-				System.out.println("수정할 제목 :");
+				System.out.printf("수정할 제목 : ");
 				String title = sc.nextLine().trim();
-				System.out.println("수정할 내용 :");
+				System.out.printf("수정할 내용 : ");
 				String body = sc.nextLine().trim();
 				
-				foundArticle.title = title;  
+				foundArticle.title = title;
+				foundArticle.body = body;
+			
+				System.out.println(id + "번 게시물이 수정되었습니다");
 				
+			} else if (cmd.startsWith("article delete ")) {
+				String[] cmdBits = cmd.split(" ");
+
+				int id = 0;
 				
-				System.out.println(id + "번 게시물이 수정 되었습니다");
+				try {
+					id = Integer.parseInt(cmdBits[2]);
+				} catch (NumberFormatException e) {
+					System.out.println("명령어가 올바르지 않습니다");
+					continue;
+				}
+				
+				Article foundArticle = null;
+				
+				for (Article article : articles) {
+					if (article.id == id) {
+						foundArticle = article;
+						break;
+					}
+				}
+				
+				if (foundArticle == null) {
+					System.out.println(id + "번 게시물이 존재하지 않습니다");
+					continue;
+				}
+				
+				articles.remove(foundArticle);
+				
+				System.out.println(id + "번 게시물이 삭제되었습니다");
 				
 			} else {
 				System.out.println("존재하지 않는 명령어 입니다");
 			}
+
 		}
+
 		sc.close();
-		System.out.println("== 프로그램 종료 ==");
+
+		System.out.println("== 프로그램 끝 ==");
+	}
+
+	private static void makeTestData() {
+		
+//		Article ar = new Article(lastArticleId++, Util.getDateStr(),"제목1", "내용1", 10);
+//		articles.add(ar);
+//		Article ar2 = new Article(lastArticleId++, Util.getDateStr(),"제목2", "내용2", 20);
+//		articles.add(ar2);
+//		Article ar3 = new Article(lastArticleId++, Util.getDateStr(),"제목3", "내용3", 30);
+//		articles.add(ar3);
+
+//		코드 2줄이 --> 1줄로 최적화 , lastAticleId++ (후위 연산자 이용)
+//		articles.add(new Article(lastArticleId++, Util.getDateStr(),"제목1", "내용1", 10));
+		
+		// 3개 --> 5개, 최적화 (2단계 ->후위연산자 사용, 코드를 2줄을 한줄로 ) --> 5번  + 반복문 ==> 시작하자 마자 실행
+		for(int i = 1; i <= 5; i++) {
+    		articles.add(new Article(lastArticleId++, Util.getDateStr(), "제목" + i, "내용" + i, i * 10));
+		}
 	}
 }
+
 class Article {
+
 	int id;
+	String regDate;
 	String title;
 	String body;
-	String regDate;
 	int viewCnt;
-
-	public Article(int id, String title, String body, String regDate, int viewCnt) {
+	
+    // 순서 수정 
+	Article(int id, String regDate, String title, String body, int viewCnt) {
 		this.id = id;
+		this.regDate = regDate;
 		this.title = title;
 		this.body = body;
-		this.regDate = regDate;
 		this.viewCnt = viewCnt;
+	}
+	
+	void increaseViewCnt() {
+		this.viewCnt++;
 	}
 }
